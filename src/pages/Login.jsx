@@ -13,8 +13,8 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-bold m-10 text-center">Login</h1>
+    <div className="max-w-md mx-auto pt-48">
+      <h1 className="text-2xl font-bold text-center">Login</h1>
       <form
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 mr-2 ml-2"

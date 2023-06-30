@@ -1,6 +1,6 @@
 import { Navigation } from "./components";
 import { Route, Routes } from "react-router-dom";
-import { Projects, Fundriser, Signup, Login } from "./pages";
+import { Projects, Contributers, Signup, Login } from "./pages";
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <Navigation />
       <Routes>
         <Route path="/" element={<Projects />} />
-        <Route path="/fundrisers" element={<Fundriser />} />
+        <Route path="/contributers" element={<Contributers />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
       </Routes>

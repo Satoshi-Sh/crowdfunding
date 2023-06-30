@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,10 +9,10 @@ function Navigation() {
   };
 
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
-      <div className="flex items-center flex-shrink-0 text-white mr-6">
+    <nav className="flex fixed w-full items-center justify-between flex-wrap bg-teal-500 p-6">
+      <Link to="/" className="flex items-center flex-shrink-0 text-white mr-6">
         <span className="font-semibold text-xl tracking-tight">Fundriser</span>
-      </div>
+      </Link>
       <div className="block lg:hidden">
         <button
           className="flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white"
@@ -41,10 +41,10 @@ function Navigation() {
             Projects
           </Link>
           <Link
-            to="/fundrisers"
+            to="/contributers"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
-            Fundrisers
+            Contributers
           </Link>
         </div>
         <div>
