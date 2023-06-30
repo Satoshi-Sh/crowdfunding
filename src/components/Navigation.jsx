@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,26 +34,26 @@ function Navigation() {
         } w-full block flex-grow lg:flex lg:items-center lg:w-auto`}
       >
         <div className="text-sm lg:flex-grow">
-          <a
-            href="#responsive-header"
+          <Link
+            to="/"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
             Projects
-          </a>
-          <a
-            href="#responsive-header"
+          </Link>
+          <Link
+            to="/fundrisers"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
             Fundrisers
-          </a>
+          </Link>
         </div>
         <div>
-          <a
-            href="#"
+          <Link
+            to="/signup"
             className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0"
           >
-            Download
-          </a>
+            Signup
+          </Link>
         </div>
       </div>
     </nav>
