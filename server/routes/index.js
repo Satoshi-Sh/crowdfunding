@@ -1,9 +1,12 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var hederaRoutes = require('./routes/hedera') // import Hedera routes
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+var app = express()
 
-module.exports = router;
+app.use(express.json()) // for parsing application/json
+
+app.use('/hedera', hederaRoutes) // use Hedera routes for paths starting with /hedera
+
+app.listen(3000, function () {
+  console.log('App listening on port 3000!')
+})
