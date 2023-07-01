@@ -6,7 +6,6 @@ import { Offcanvas } from "../components";
 const SingleProject = () => {
   const { id } = useParams();
   const data = sampleData.find((item) => item.id === Number(id));
-  console.log(data);
   return (
     <div className="pt-12 text-center">
       <h1 className="pt-20 mb-3 text-4xl font-extrabold">{data.title}</h1>
