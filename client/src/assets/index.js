@@ -13,6 +13,7 @@ import money from "./money.svg";
 import loader from "./loader.svg";
 import thirdweb from "./thirdweb.png";
 import sampleData from "./sample";
+import allRegions from "./locations";
 
 export {
   tagType,
@@ -30,4 +31,5 @@ export {
   loader,
   thirdweb,
   sampleData,
+  allRegions,
 };

@@ -41,10 +41,10 @@ function Navigation() {
             Projects
           </Link>
           <Link
-            to="/contributers"
+            to="/create-project"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
-            Contributers
+            Create Project
           </Link>
         </div>
         <div>
