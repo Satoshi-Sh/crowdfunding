@@ -1,6 +1,6 @@
 import { Navigation } from "./components";
 import { Route, Routes } from "react-router-dom";
-import { Projects, Contributers, Signup, Login } from "./pages";
+import { SingleProject, Projects, Contributers, Signup, Login } from "./pages";
 
 function App() {
   return (
@@ -11,6 +11,7 @@ function App() {
         <Route path="/contributers" element={<Contributers />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/project/:id" element={<SingleProject />} />
       </Routes>
     </div>
   );

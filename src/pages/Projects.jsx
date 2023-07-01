@@ -1,6 +1,6 @@
 import React from "react";
 import { Project } from "../components";
-import sampleData from "../assets/sample";
+import { sampleData } from "../assets";
 
 const Projects = () => {
   console.log(sampleData);
