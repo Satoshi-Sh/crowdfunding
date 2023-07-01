@@ -40,6 +40,32 @@ router.post('/register', async function (req, res) {
   })
 })
 
+// Each fundraiser will have its own account
+router.post('/createFundraiser', async function (req, res) {
+  const {fundraiserId} = req.body // extract fundraiser id from request body
+
+  // Generate a new key pair for this fundraiser
+  const privateKey = PrivateKey.generateED25519()
+  const publicKey = privateKey.publicKey
+
+  // Create a new account with the generated key pair
+  const transactionIdNewAccount = await new AccountCreateTransaction()
+    .setKey(publicKey)
+    .setInitialBalance(new Hbar(0)) // Set an initial balance
+    .execute(client)
+
+  const receiptNewAccount = await transactionIdNewAccount.getReceipt(client)
+  const newAccountId = receiptNewAccount.accountId
+
+  // Store the fundraiser id and the associated Hedera account id in your database
+
+  res.json({
+    fundraiserId: fundraiserId,
+    accountId: newAccountId.toString(),
+    privateKey: privateKey.toString(),
+  })
+})
+
 router.post('/donate', async function (req, res) {
   const {senderPrivateKey, senderAccountId, recipientAccountId, amount} =
     req.body
