@@ -1,0 +1,29 @@
+{
+  "files": {
+    "main.css": "/frontend-crowdfunding/static/css/main.d5abb3ee.css",
+    "main.js": "/frontend-crowdfunding/static/js/main.783e14b6.js",
+    "static/js/787.021fa20a.chunk.js": "/frontend-crowdfunding/static/js/787.021fa20a.chunk.js",
+    "static/media/thirdweb.png": "/frontend-crowdfunding/static/media/thirdweb.4a1260bb078cb7ad327d.png",
+    "static/media/loader.svg": "/frontend-crowdfunding/static/media/loader.749ea58c204fa1a16c48a646540bac24.svg",
+    "static/media/create-campaign.svg": "/frontend-crowdfunding/static/media/create-campaign.b6b061fc281c072f59d48cb183b88bb8.svg",
+    "static/media/sun.svg": "/frontend-crowdfunding/static/media/sun.6a46fc6531dee8c998242af3e3284810.svg",
+    "static/media/money.svg": "/frontend-crowdfunding/static/media/money.0c32f9f28762c90e3807805db37051a8.svg",
+    "static/media/withdraw.svg": "/frontend-crowdfunding/static/media/withdraw.4f1bac3962c29f3b7fa2ce5f6c9401dc.svg",
+    "static/media/payment.svg": "/frontend-crowdfunding/static/media/payment.53dd64d62a2f4ca9a6e61abe22a910f4.svg",
+    "static/media/dashboard.svg": "/frontend-crowdfunding/static/media/dashboard.ad50c714ac2cdcba1d7781c628ce6251.svg",
+    "static/media/logo.svg": "/frontend-crowdfunding/static/media/logo.1d71cb02bb8152159a2b0a6ea6342ef2.svg",
+    "static/media/search.svg": "/frontend-crowdfunding/static/media/search.122c257fee1ff743710b8b536e7b22ee.svg",
+    "static/media/logout.svg": "/frontend-crowdfunding/static/media/logout.5d569ae321cd0588cb621851e8324f5e.svg",
+    "index.html": "/frontend-crowdfunding/index.html",
+    "static/media/profile.svg": "/frontend-crowdfunding/static/media/profile.ed93256a58def1186cfa42d789e8e362.svg",
+    "static/media/type.svg": "/frontend-crowdfunding/static/media/type.40282b569eaba9e952376b7e8c75f39e.svg",
+    "static/media/menu.svg": "/frontend-crowdfunding/static/media/menu.6c52b7f597492f7ab662db01b08f0a0b.svg",
+    "main.d5abb3ee.css.map": "/frontend-crowdfunding/static/css/main.d5abb3ee.css.map",
+    "main.783e14b6.js.map": "/frontend-crowdfunding/static/js/main.783e14b6.js.map",
+    "787.021fa20a.chunk.js.map": "/frontend-crowdfunding/static/js/787.021fa20a.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d5abb3ee.css",
+    "static/js/main.783e14b6.js"
+  ]
+}
