@@ -20,7 +20,7 @@ client.setOperator(myAccountId, myPrivateKey)
 client.setDefaultMaxTransactionFee(new Hbar(100))
 client.setMaxQueryPayment(new Hbar(50))
 
-router.post('/register', async function (req, res, next) {
+router.post('/register', async function (req, res) {
   const {userId} = req.body // extract user id from request body
 
   const privateKey = PrivateKey.generateED25519()
@@ -40,20 +40,21 @@ router.post('/register', async function (req, res, next) {
   })
 })
 
-router.post('/donate', async function (req, res, next) {
-  const {senderPrivateKey, senderPublicKey, recipientAccountId, amount} =
+router.post('/donate', async function (req, res) {
+  const {senderPrivateKey, senderAccountId, recipientAccountId, amount} =
     req.body
 
   // Create the client with sender's account ID and private key
   const client = Client.forTestnet()
-  client.setOperator(senderPublicKey, senderPrivateKey)
+  client.setOperator(senderAccountId, senderPrivateKey)
   client.setDefaultMaxTransactionFee(new Hbar(100))
 
   // Convert the amount in dollars to Hbars
   const amountInHbars = Hbar.from(new BigNumber(amount), HbarUnit.USDCENT)
+
   try {
     const transactionId = await new TransferTransaction()
-      .addHbarTransfer(senderPublicKey, amountInHbars.negated()) // sender's account and the amount to send
+      .addHbarTransfer(senderAccountId, amountInHbars.negated()) // sender's account and the amount to send
       .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
       .execute(client)
 
@@ -65,7 +66,7 @@ router.post('/donate', async function (req, res, next) {
   }
 })
 
-router.post('/anonymousDonate', async function (req, res, next) {
+router.post('/anonymousDonate', async function (req, res) {
   const {amount, recipientAccountId} = req.body
 
   // Convert the amount in dollars to Hbars
@@ -98,6 +99,23 @@ router.post('/checkTransaction', async function (req, res, next) {
 
   // Respond with the transaction status
   res.json({status: status.toString()})
+})
+
+// For getting balance
+router.get('/balance/:accountId', async function (req, res) {
+  const {accountId} = req.params
+  const balance = await new AccountBalanceQuery()
+    .setAccountId(accountId)
+    .execute(client)
+  res.json({hbars: balance.hbars.toTinybars().toString()})
+})
+
+router.get('/accountInfo/:accountId', async function (req, res, next) {
+  const {accountId} = req.params
+  const info = await new AccountInfoQuery()
+    .setAccountId(accountId)
+    .execute(client)
+  res.json(info)
 })
 
 module.exports = router
