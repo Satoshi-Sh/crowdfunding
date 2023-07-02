@@ -126,7 +126,9 @@ router.get('/balance/:accountId', async function (req, res) {
   const balance = await new AccountBalanceQuery()
     .setAccountId(accountId)
     .execute(client)
-  res.json({hbars: balance.hbars.toString()})
+
+  const usd = await convertHbarToUSD(balance.hbars.to(HbarUnit.Hbar))
+  res.json({hbars: balance.hbars.toString(), usd})
 })
 
 router.get('/accountInfo/:accountId', async function (req, res, next) {
@@ -158,6 +160,28 @@ async function getHbarEquivalent(dollarAmount) {
   hbars = hbars.toFixed(8)
 
   return hbars
+}
+
+async function convertHbarToUSD(hbarAmount) {
+  const response = await axios.get(
+    'https://mainnet-public.mirrornode.hedera.com/api/v1/network/exchangerate',
+  )
+
+  const data = response.data
+
+  const centEquivalentPerHbar =
+    data.current_rate.cent_equivalent / data.current_rate.hbar_equivalent
+
+  // Convert hbars to cents
+  let cents = hbarAmount * centEquivalentPerHbar
+
+  // Convert cents to dollars
+  let dollars = cents / 100
+
+  // Round to 2 decimal places
+  dollars = dollars.toFixed(2)
+
+  return dollars
 }
 
 module.exports = router

@@ -98,12 +98,14 @@ curl -X POST -H "Content-Type: application/json" -d "{\"number\": \"400740000000
 
 ### Finally, lets check the fundraiser account again
 
-Last time, it had 5 hbars, now it should have around 105 hbars
+Last time, it had 5 hbars, now it should have around 105 hbars, which is around 5.25$ in USD
+And this makes sense because we first donated 0.25$ to the fundraiser, and then 5$ to the fundraiser
+
 ```bash
 curl http://localhost:3000/hedera/balance/0.0.15032472
 ```
 
 And it works~
 ```json
-{"hbars":"105.15215496 ℏ"}
+{"hbars":"105.15215496 ℏ","usd":"5.25"}
 ```
