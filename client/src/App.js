@@ -15,7 +15,7 @@ function App() {
       <Navigation />
       <Routes>
         <Route path="/" element={<Projects />} />
-        <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/create-campaign" element={<CreateProject />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/campaign/:id" element={<SingleProject />} />
