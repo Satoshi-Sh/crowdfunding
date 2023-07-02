@@ -1,12 +1,20 @@
-var express = require('express')
+const express = require('express')
+const router = express.Router()
 var hederaRoutes = require('./hedera') // import Hedera routes
 
-var app = express()
+// Middleware
+// Add cors
+var cors = require('cors')
+router.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+)
 
-app.use(express.json()) // for parsing application/json
+router.use(express.json()) // for parsing application/json
 
-app.use('/hedera', hederaRoutes) // use Hedera routes for paths starting with /hedera
+router.use('/hedera', hederaRoutes) // use Hedera routes for paths starting with /hedera
 
-app.listen(3000, function () {
-  console.log('App listening on port 3000!')
-})
+module.exports = router

@@ -1,5 +1,7 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
+const BigNumber = require('bignumber.js')
+
 const {
   Client,
   PrivateKey,
@@ -8,6 +10,9 @@ const {
   Hbar,
   TransferTransaction,
   TransactionId,
+  HbarUnit,
+  AccountBalanceQuery,
+  AccountInfoQuery,
 } = require('@hashgraph/sdk')
 var {Circle, CircleEnvironments} = require('@circle-fin/circle-sdk')
 require('dotenv').config()
@@ -215,7 +220,7 @@ router.get('/balance/:accountId', async function (req, res) {
   const balance = await new AccountBalanceQuery()
     .setAccountId(accountId)
     .execute(client)
-  res.json({hbars: balance.hbars.toTinybars().toString()})
+  res.json({hbars: balance.hbars.toString()})
 })
 
 router.get('/accountInfo/:accountId', async function (req, res, next) {
