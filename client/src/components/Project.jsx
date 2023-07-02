@@ -1,13 +1,15 @@
-import React from "react";
-import { keepShorter } from "../utils";
-import { useNavigate } from "react-router-dom";
+import React from 'react'
+import {keepShorter} from '../utils'
+import {useNavigate} from 'react-router-dom'
 
 const Project = (props) => {
-  const { data } = props;
-  const navigate = useNavigate();
+  const {data} = props
+
+  const navigate = useNavigate()
   const handleClick = (e) => {
-    navigate(`/campaign/${e.currentTarget.id}`);
-  };
+    navigate(`/campaign/${e.currentTarget.id}`)
+  }
+
   return (
     <div
       className="max-w-sm rounded overflow-hidden shadow-lg mt-20 p-4 cursor-pointer"
@@ -36,7 +38,7 @@ const Project = (props) => {
         <span className="text-gray-700 italic">{data.location}</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Project;
+export default Project

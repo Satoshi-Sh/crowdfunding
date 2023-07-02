@@ -1,11 +1,27 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import { sampleData } from "../assets";
-import { Offcanvas } from "../components";
+import React, {useEffect, useState} from 'react'
+import {useParams} from 'react-router-dom'
+import {sampleData} from '../assets'
+import {Offcanvas} from '../components'
+import axios from 'axios'
 
 const SingleProject = () => {
-  const { id } = useParams();
-  const data = sampleData.find((item) => item.id === Number(id));
+  const {id} = useParams()
+  const [currentAmount, setCurrentAmount] = useState()
+  useEffect(() => {
+    try {
+      axios
+        .get(`http://localhost:3001/hedera/balance/${data.accountId}`)
+        .then(function (response) {
+          setCurrentAmount(response.data.usd)
+        })
+        .catch(function (error) {
+          console.error(error)
+        })
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+  const data = sampleData.find((item) => item.id === Number(id))
   return (
     <div className="pt-12 text-center">
       <h1 className="pt-20 mb-3 text-4xl font-extrabold">{data.title}</h1>
@@ -22,7 +38,7 @@ const SingleProject = () => {
       <p className="max-w-lg p-3 mx-auto">{data.description}</p>
       <div className="flex flex-row justify-evenly p-10">
         <span className="text-gray-700 text-lg italic">
-          Current: ${data.currentAmount}
+          Current: ${currentAmount}
         </span>
         <span className="text-gray-700 italic text-lg">
           Goal: ${data.goalAmount}
@@ -35,7 +51,7 @@ const SingleProject = () => {
 
       <Offcanvas data={data} />
     </div>
-  );
-};
+  )
+}
 
-export default SingleProject;
+export default SingleProject

@@ -25,13 +25,12 @@ const CardPayment = () => {
       addressLine1,
       addressLine2, //Remove this
       countryCode,
-      city, //New
-      state, //New
-      postalCode, //New
+      // city, //New
+      // state, //New
+      // postalCode, //New
       phone, // Remove this
       email,
     })
-    
   }
   return (
     <>
