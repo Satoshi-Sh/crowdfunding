@@ -1,33 +1,48 @@
-import React, { useState } from "react";
-import { allRegions } from "../assets";
+import React, {useState} from 'react'
+import axios from 'axios'
+import {allRegions} from '../assets'
+import {v4 as uuidv4} from 'uuid'
 
 const CreateProject = () => {
-  const [title, setTitle] = useState("");
-  const [goalAmount, setgoalAmount] = useState(100);
-  const [due, setDue] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [title, setTitle] = useState('')
+  const [goalAmount, setgoalAmount] = useState(100)
+  const [due, setDue] = useState('')
+  const [location, setLocation] = useState('')
+  const [description, setDescription] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     // Perform form submission logic here
-    console.log("Submitted:", {
+    console.log('Submitted:', {
       title,
       goalAmount,
       due,
       location,
       description,
       selectedFile,
-    });
-  };
+    })
+    let fundraiserId = uuidv4()
+
+    axios
+      .post('http://localhost:3000/hedera/createFundraiser', {
+        fundraiserId: fundraiserId,
+      })
+      .then(function (response) {
+        // {fundraiserId, accountId, privateKey}
+        console.log(response.data)
+      })
+      .catch(function (error) {
+        console.error(error)
+      })
+  }
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-  };
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().split("T")[0];
+    const file = event.target.files[0]
+    setSelectedFile(file)
+  }
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  const minDate = tomorrow.toISOString().split('T')[0]
 
   return (
     <div className="max-w-md mx-auto pt-48">
@@ -157,7 +172,7 @@ const CreateProject = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default CreateProject;
+export default CreateProject

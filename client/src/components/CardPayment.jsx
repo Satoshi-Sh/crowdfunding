@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import axios from 'axios'
 
 const CardPayment = () => {
   const [showModal, setShowModal] = useState(false)
@@ -30,6 +31,7 @@ const CardPayment = () => {
       phone, // Remove this
       email,
     })
+    
   }
   return (
     <>

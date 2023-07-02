@@ -1,23 +1,33 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, {useState} from 'react'
+import {Link} from 'react-router-dom'
+import axios from 'axios'
 
 const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [walletAccount, setWalletAccount] = useState("");
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [walletAccount, setWalletAccount] = useState('')
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (password !== confirmPassword) {
-      alert("Passwords don't match");
-      return;
+      alert("Passwords don't match")
+      return
     }
     // Perform form submission logic here
-    console.log("Submitted:", { name, email, password, walletAccount });
-  };
+    console.log('Submitted:', {name, email, password, walletAccount})
+    // axios
+    //   .post('http://localhost:3001/hedera/register')
+    //   .then(function (response) {
+    //     // {accountId, privateKey}
+    //     console.log(response.data)
+    //   })
+    //   .catch(function (error) {
+    //     console.error(error)
+    //   })
+  }
 
   return (
     <div className="max-w-md mx-auto pt-48">
@@ -112,7 +122,7 @@ const Signup = () => {
           />
         </div>
         <p className="text-center m-5">
-          * If you have an account.{" "}
+          * If you have an account.{' '}
           {
             <Link to="/login" className="text-blue-500">
               Log in
@@ -129,7 +139,7 @@ const Signup = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Signup;
+export default Signup
