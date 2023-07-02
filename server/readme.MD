@@ -73,3 +73,37 @@ curl http://localhost:3000/hedera/balance/0.0.15032471
 ```json
 {"hbars":"4.99337772 ℏ"}
 ```
+
+### Now lets start testing circle
+First testing encrypting a dummy card number and cvc provided by Circle
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d "{\"cardNumber\":\"4007400000000007\",\"cvc\":\"123\"}" http://localhost:3000/circle/encryptCard
+```
+
+```json
+{"encryptedData":{"encryptedMessage":"LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgp3Y0JNQTBYV1NGbEZScFZoQVFnQW92ZncvZTFBcEJ6enUyNTk3ZSt4MzhSc0RzaC9SVUVTZWJUNVQrSk4KME9yd085bi9hZS9nTGVkblpPS1I3WlNpVWx1d0dDWWNjSDdtekhBWTNTQXFRblFLaGVOMVV5TlRPTHZ1CktzWU4vUmtyN3dXZWVQMWd0NHFpL21NMWFvWWFQY3QxMlI4NXdxN1VaZlAwalpLcXBqTHU2OHYzQjBSQwp1RmFKYUF6cnliUzE5VXFuRi8rUVZpUHlkY1FMblVEQXJHYjdrYXFuUnNNdkFTSkNwNHg0SkcxTGFObHMKTlJ0UVNWZTBaRlNkVWNzSkNUS2FHUTk3N2ZIZW9VOU96djBMUmxxQ2lvZU5YWWJROG5Yem9ZdGtoaWNwCjRJd0REUTN0Q1RBUUtITE9WeXIzb0ZIZTVXSm8zOUJFdS82aWZWM3Z6bFZrWnZNNWlROHVLdEwxV1EveQpCTkphQWNDVU9EZlhUMzA0YVdEemRGYjRwM3hKcWF6ZHZXODczVXZmNHdFM1dhYUZTbVEyRjI0ajNJY2sKM2dLSVRzSkxSVnN3QUFuTFZ2NU15cEJOMGFYdVBZcVc4RmlOUXZmajFUWGlwYVJQMGRRUXd2ZUQ4aW11CldsR1QKPU9NN2gKLS0tLS1FTkQgUEdQIE1FU1NBR0UtLS0tLQo=","keyId":"key1"}}
+```
+
+### Donating 5$ to the fundraiser with a dummy card number and cvc.
+
+5$ is around 99.6810207336523 Hbar now
+```bash
+curl -X POST -H "Content-Type: application/json" -d "{\"number\": \"4007400000000007\", \"cvc\": \"123\", \"expMonth\": 12, \"expYear\": 2024, \"billingDetails\": {\"name\": \"John Doe\", \"city\": \"San Francisco\", \"country\": \"US\", \"line1\": \"123 Main St\", \"postalCode\": \"94103\", \"district\":\"CA\"}, \"metadata\": {\"email\": \"john.doe@example.com\", \"sessionId\": \"hashed_session_id\", \"ipAddress\": \"192.0.2.1\"},\"amount\": 5, \"recipientAccountId\":\"0.0.15032472\"}" http://localhost:3000/circle/anonymousDonate
+```
+
+```json
+{"status":"success","transactionId":"{\"nodeId\":\"0.0.6\",\"transactionHash\":\"3c7e8cdfcc67a7df0a89ca5bf6b833371258e55b36acf99055b563f395bc29da4f526f6d386b390d6fc000aa356d4c5d\",\"transactionId\":\"0.0.15028047@1688300897.106887451\"}"}
+```
+
+### Finally, lets check the fundraiser account again
+
+Last time, it had 5 hbars, now it should have around 105 hbars
+```bash
+curl http://localhost:3000/hedera/balance/0.0.15032472
+```
+
+And it works~
+```
+{"hbars":"105.15215496 ℏ"}
+```
