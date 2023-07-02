@@ -1,5 +1,7 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
+const BigNumber = require('bignumber.js')
+
 const {
   Client,
   PrivateKey,
@@ -8,7 +10,11 @@ const {
   Hbar,
   TransferTransaction,
   TransactionId,
+  HbarUnit,
+  AccountBalanceQuery,
+  AccountInfoQuery,
 } = require('@hashgraph/sdk')
+var {Circle, CircleEnvironments} = require('@circle-fin/circle-sdk')
 require('dotenv').config()
 
 const myAccountId = process.env.MY_ACCOUNT_ID
@@ -21,8 +27,6 @@ client.setDefaultMaxTransactionFee(new Hbar(100))
 client.setMaxQueryPayment(new Hbar(50))
 
 router.post('/register', async function (req, res) {
-  const {userId} = req.body // extract user id from request body
-
   const privateKey = PrivateKey.generateED25519()
   const publicKey = privateKey.publicKey
 
@@ -92,21 +96,104 @@ router.post('/donate', async function (req, res) {
   }
 })
 
-router.post('/anonymousDonate', async function (req, res) {
-  const {amount, recipientAccountId} = req.body
+// Sample input
+// {
+//   "encryptedData": "base64_encoded_encrypted_card_data",
+//   "expMonth": 12,
+//   "expYear": 2024,
+//   "billingDetails": {
+//     "name": "John Doe",
+//     "city": "San Francisco",
+//     "country": "US",
+//     "line1": "123 Main St",
+//     "postalCode": "94103"
+//   },
+//   "metadata": {
+//     "email": "john.doe@example.com",
+//     "sessionId": "hashed_session_id",
+//     "ipAddress": "192.0.2.1"
+//   }
+// }
 
-  // Convert the amount in dollars to Hbars
+router.post('/anonymousDonate', async function (req, res) {
+  const circle = new Circle(
+    process.env.CIRCLE_API_KEY,
+    CircleEnvironments.sandbox, // API base url
+  )
+
+  const {encryptedData, expMonth, expYear, billingDetails, metadata} = req.body
+
+  // Validate the request body to ensure all required fields are provided
+
+  if (!encryptedData || !expMonth || !expYear || !billingDetails || !metadata) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Missing required fields in request body',
+    })
+  }
+
+  const idempotencyKey = uuidv4()
+
+  const cardDetails = {
+    encryptedData,
+    expMonth,
+    expYear,
+    billingDetails,
+    metadata,
+  }
+  let cardId
+  try {
+    const response = await circle.cards.createCard(idempotencyKey, cardDetails)
+    cardId = response.data.id
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+    })
+  }
+
+  try {
+    const createPaymentResponse = await circle.payments.createPayment({
+      idempotencyKey: uuidv4(), // use UUID for idempotencyKey
+      metadata: metadata,
+      amount: {
+        amount: amount.toString(),
+        currency: 'USD',
+      },
+      autoCapture: true, // capture the payment automatically
+      verification: 'cvv',
+      source: {
+        id: cardId, // use the cardId retrieved from the createCard endpoint
+        type: 'card',
+      },
+      description: `Anonymous donation of $${amount} to account ${recipientAccountId}`,
+    })
+
+    // Check the payment status
+    if (createPaymentResponse.data.status !== 'paid') {
+      return res
+        .status(400)
+        .json({status: 'error', error: 'Payment failed', createPaymentResponse})
+    }
+  } catch (error) {
+    return res.status(500).json({status: 'error', error: error.toString()})
+  }
+
+  // Convert the amount in dollars to Hbars and send to the recipient from our account
   const amountInHbars = Hbar.from(amount, HbarUnit.USDCENT)
 
-  // Send donation from the main account to the recipient's account
-  const transactionId = await new TransferTransaction()
-    .addHbarTransfer(operatorId, amountInHbars.negated()) // sender's account and the amount to send
-    .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
-    .execute(client)
+  try {
+    const transactionId = await new TransferTransaction()
+      .addHbarTransfer(operatorId, amountInHbars.negated()) // sender's account and the amount to send
+      .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
+      .execute(client)
 
-  const receipt = await transactionId.getReceipt(client)
+    const receipt = await transactionId.getReceipt(client)
 
-  res.json({status: 'success', transactionId: transactionId.toString()})
+    res.json({status: 'success', transactionId: transactionId.toString()})
+  } catch (err) {
+    res.status(500).json({status: 'error', error: err.toString()})
+  }
 })
 
 router.post('/checkTransaction', async function (req, res, next) {
@@ -133,7 +220,7 @@ router.get('/balance/:accountId', async function (req, res) {
   const balance = await new AccountBalanceQuery()
     .setAccountId(accountId)
     .execute(client)
-  res.json({hbars: balance.hbars.toTinybars().toString()})
+  res.json({hbars: balance.hbars.toString()})
 })
 
 router.get('/accountInfo/:accountId', async function (req, res, next) {
