@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Payment from "./Payment";
+import CardPayment from "./CardPayment";
 
 const Offcanvas = (props) => {
   const { data } = props;
@@ -30,6 +31,7 @@ const Offcanvas = (props) => {
             {data.businessName}
           </h4>
           <Payment />
+          <CardPayment />
         </div>
       )}
     </div>
