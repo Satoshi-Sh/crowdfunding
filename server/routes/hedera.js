@@ -18,7 +18,7 @@ var {Circle, CircleEnvironments} = require('@circle-fin/circle-sdk')
 require('dotenv').config()
 const {v4: uuidv4} = require('uuid')
 const axios = require('axios')
-const {readKey, createMessage, encrypt} = require('openpgp')
+const {readKey, createMessage, encrypt, Key, armor} = require('openpgp')
 
 const myAccountId = process.env.MY_ACCOUNT_ID
 const myPrivateKey = process.env.MY_PRIVATE_KEY
@@ -73,12 +73,6 @@ router.post('/createFundraiser', async function (req, res) {
   })
 })
 
-router.post('/convertToHbar', async function (req, res) {
-  const {amount} = req.body
-  const hbars = await getHbarEquivalent(amount)
-  res.json({hbars: hbars})
-})
-
 router.post('/donate', async function (req, res) {
   const {senderPrivateKey, senderAccountId, recipientAccountId, amount} =
     req.body
@@ -105,122 +99,6 @@ router.post('/donate', async function (req, res) {
     res.json({status: 'success', transactionId: transactionId.toString()})
   } catch (err) {
     res.json({status: 'error', error: err})
-  }
-})
-
-router.post('/encryptCard', async function (req, res) {
-  const {cardNumber, cvc} = req.body
-  console.log(process.env.CIRCLE_API_KEY)
-
-  const circle = new Circle(
-    process.env.CIRCLE_API_KEY,
-    CircleEnvironments.sandbox, // API base url
-  )
-  const publicKey = await circle.encryption.getPublicKey()
-  console.log(publicKey)
-  return {}
-  const encryptedData = await encryptCardData(cardNumber, cvc, publicKey)
-  res.json({encryptedData: encryptedData})
-})
-
-// Sample input
-// {
-//   "encryptedData": "base64_encoded_encrypted_card_data",
-//   "expMonth": 12,
-//   "expYear": 2024,
-//   "billingDetails": {
-//     "name": "John Doe",
-//     "city": "San Francisco",
-//     "country": "US",
-//     "line1": "123 Main St",
-//     "postalCode": "94103"
-//   },
-//   "metadata": {
-//     "email": "john.doe@example.com",
-//     "sessionId": "hashed_session_id",
-//     "ipAddress": "192.0.2.1"
-//   }
-// }
-
-router.post('/anonymousDonate', async function (req, res) {
-  const circle = new Circle(
-    process.env.CIRCLE_API_KEY,
-    CircleEnvironments.sandbox, // API base url
-  )
-
-  const {
-    encryptedData,
-    expMonth,
-    expYear,
-    billingDetails,
-    metadata,
-    amount,
-    recipientAccountId,
-  } = req.body
-
-  const publicKey = circle.encryption.getPublicKey()
-
-  const idempotencyKey = uuidv4()
-
-  const cardDetails = {
-    encryptedData,
-    expMonth,
-    expYear,
-    billingDetails,
-    metadata,
-  }
-  let cardId
-  try {
-    const response = await circle.cards.createCard(idempotencyKey, cardDetails)
-    cardId = response.data.id
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-    })
-  }
-
-  try {
-    const createPaymentResponse = await circle.payments.createPayment({
-      idempotencyKey: uuidv4(), // use UUID for idempotencyKey
-      metadata: metadata,
-      amount: {
-        amount: amount.toString(),
-        currency: 'USD',
-      },
-      autoCapture: true, // capture the payment automatically
-      verification: 'cvv',
-      source: {
-        id: cardId, // use the cardId retrieved from the createCard endpoint
-        type: 'card',
-      },
-      description: `Anonymous donation of $${amount} to account ${recipientAccountId}`,
-    })
-
-    // Check the payment status
-    if (createPaymentResponse.data.status !== 'paid') {
-      return res
-        .status(400)
-        .json({status: 'error', error: 'Payment failed', createPaymentResponse})
-    }
-  } catch (error) {
-    return res.status(500).json({status: 'error', error: error.toString()})
-  }
-
-  // Convert the amount in dollars to Hbars and send to the recipient from our account
-  const amountInHbars = Hbar.from(amount, HbarUnit.USDCENT)
-
-  try {
-    const transactionId = await new TransferTransaction()
-      .addHbarTransfer(myAccountId, amountInHbars.negated()) // sender's account and the amount to send
-      .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
-      .execute(client)
-
-    const receipt = await transactionId.getReceipt(client)
-
-    res.json({status: 'success', transactionId: transactionId.toString()})
-  } catch (err) {
-    res.status(500).json({status: 'error', error: err.toString()})
   }
 })
 
@@ -274,39 +152,12 @@ async function getHbarEquivalent(dollarAmount) {
   const cents = dollarAmount * 100
 
   // Convert input cents to hbars
-  const hbars = cents / centEquivalentPerHbar
+  let hbars = cents / centEquivalentPerHbar
+
+  // Round to 8 decimal places
+  hbars = hbars.toFixed(8)
 
   return hbars
-}
-
-async function encryptCardData(number, cvv, publicKey) {
-  // Card data to be encrypted
-  const cardData = {
-    number,
-    cvv,
-  }
-
-  // Decode the public key
-  const decodedPublicKey = await readKey({
-    armoredKey: Buffer.from(publicKey).toString('base64'),
-  })
-
-  // Create a message from the card data
-  const message = await createMessage({text: JSON.stringify(cardData)})
-
-  // Encrypt the message with the public key
-  const ciphertext = await encrypt({
-    message,
-    encryptionKeys: decodedPublicKey,
-  })
-
-  // Return the encrypted message
-  const encryptedData = {
-    encryptedMessage: Buffer.from(ciphertext).toString('utf8'),
-    keyId: decodedPublicKey.getKeyId().toHex(),
-  }
-
-  return encryptedData
 }
 
 module.exports = router
