@@ -91,29 +91,75 @@ router.post('/donate', async function (req, res) {
   }
 })
 
+// Sample input
+// {
+//   "encryptedData": "base64_encoded_encrypted_card_data",
+//   "expMonth": 12,
+//   "expYear": 2024,
+//   "billingDetails": {
+//     "name": "John Doe",
+//     "city": "San Francisco",
+//     "country": "US",
+//     "line1": "123 Main St",
+//     "postalCode": "94103"
+//   },
+//   "metadata": {
+//     "email": "john.doe@example.com",
+//     "sessionId": "hashed_session_id",
+//     "ipAddress": "192.0.2.1"
+//   }
+// }
+
 router.post('/anonymousDonate', async function (req, res) {
   const circle = new Circle(
     process.env.CIRCLE_API_KEY,
     CircleEnvironments.sandbox, // API base url
   )
 
-  const {cardNumber, expMonth, expYear, cvv, amount, recipientAccountId} =
-    req.body
+  const {encryptedData, expMonth, expYear, billingDetails, metadata} = req.body
+
+  // Validate the request body to ensure all required fields are provided
+
+  if (!encryptedData || !expMonth || !expYear || !billingDetails || !metadata) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Missing required fields in request body',
+    })
+  }
+
+  const idempotencyKey = uuidv4()
+
+  const cardDetails = {
+    encryptedData,
+    expMonth,
+    expYear,
+    billingDetails,
+    metadata,
+  }
+
+  try {
+    const response = await circle.cards.createCard(idempotencyKey, cardDetails)
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message,
+    })
+  }
+
+  const cardId = response.data.id
 
   try {
     const createPaymentResponse = await circle.payments.createPayment({
-      idempotencyKey: new Date().getTime().toString(),
-      metadata: {},
+      idempotencyKey: uuidv4(), // use UUID for idempotencyKey
+      metadata: metadata,
       amount: {
         amount: amount.toString(),
         currency: 'USD',
       },
+      autoCapture: true, // capture the payment automatically
       verification: 'cvv',
       source: {
-        id: 'card:' + cardNumber,
-        cvv: cvv,
-        expMonth: expMonth,
-        expYear: expYear,
+        id: cardId, // use the cardId retrieved from the createCard endpoint
         type: 'card',
       },
       description: `Anonymous donation of $${amount} to account ${recipientAccountId}`,
@@ -123,7 +169,7 @@ router.post('/anonymousDonate', async function (req, res) {
     if (createPaymentResponse.data.status !== 'paid') {
       return res
         .status(400)
-        .json({status: 'error', error: 'Payment failed', circlePayment})
+        .json({status: 'error', error: 'Payment failed', createPaymentResponse})
     }
   } catch (error) {
     return res.status(500).json({status: 'error', error: error.toString()})
