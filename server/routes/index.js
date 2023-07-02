@@ -1,5 +1,5 @@
 var express = require('express')
-var hederaRoutes = require('./routes/hedera') // import Hedera routes
+var hederaRoutes = require('./hedera') // import Hedera routes
 
 var app = express()
 

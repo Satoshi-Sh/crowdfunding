@@ -9,6 +9,7 @@ const {
   TransferTransaction,
   TransactionId,
 } = require('@hashgraph/sdk')
+var {Circle, CircleEnvironments} = require('@circle-fin/circle-sdk')
 require('dotenv').config()
 
 const myAccountId = process.env.MY_ACCOUNT_ID
@@ -21,8 +22,6 @@ client.setDefaultMaxTransactionFee(new Hbar(100))
 client.setMaxQueryPayment(new Hbar(50))
 
 router.post('/register', async function (req, res) {
-  const {userId} = req.body // extract user id from request body
-
   const privateKey = PrivateKey.generateED25519()
   const publicKey = privateKey.publicKey
 
@@ -93,42 +92,35 @@ router.post('/donate', async function (req, res) {
 })
 
 router.post('/anonymousDonate', async function (req, res) {
+  const circle = new Circle(
+    process.env.CIRCLE_API_KEY,
+    CircleEnvironments.sandbox, // API base url
+  )
+
   const {cardNumber, expMonth, expYear, cvv, amount, recipientAccountId} =
     req.body
 
   try {
-    // This buys USDC and deplosits it into our Circle account
-    const circleResponse = await axios.post(
-      'https://api-sandbox.circle.com/v1/payments',
-      {
-        idempotencyKey: new Date().getTime().toString(),
-        metadata: {},
-        amount: {
-          amount: amount.toString(),
-          currency: 'USD',
-        },
-        verification: 'cvv',
-        source: {
-          id: 'card:' + cardNumber,
-          cvv: cvv,
-          expMonth: expMonth,
-          expYear: expYear,
-          type: 'card',
-        },
-        description: `Anonymous donation of $${amount} to account ${recipientAccountId}`,
+    const createPaymentResponse = await circle.payments.createPayment({
+      idempotencyKey: new Date().getTime().toString(),
+      metadata: {},
+      amount: {
+        amount: amount.toString(),
+        currency: 'USD',
       },
-      {
-        headers: {
-          Authorization: 'Bearer ' + process.env.CIRCLE_API_KEY,
-          'Content-Type': 'application/json',
-        },
+      verification: 'cvv',
+      source: {
+        id: 'card:' + cardNumber,
+        cvv: cvv,
+        expMonth: expMonth,
+        expYear: expYear,
+        type: 'card',
       },
-    )
-
-    const circlePayment = circleResponse.data
+      description: `Anonymous donation of $${amount} to account ${recipientAccountId}`,
+    })
 
     // Check the payment status
-    if (circlePayment.status !== 'paid') {
+    if (createPaymentResponse.data.status !== 'paid') {
       return res
         .status(400)
         .json({status: 'error', error: 'Payment failed', circlePayment})
