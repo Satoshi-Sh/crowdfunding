@@ -104,6 +104,6 @@ curl http://localhost:3000/hedera/balance/0.0.15032472
 ```
 
 And it works~
-```
+```json
 {"hbars":"105.15215496 ℏ"}
 ```
