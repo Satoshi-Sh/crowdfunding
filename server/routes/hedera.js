@@ -93,20 +93,65 @@ router.post('/donate', async function (req, res) {
 })
 
 router.post('/anonymousDonate', async function (req, res) {
-  const {amount, recipientAccountId} = req.body
+  const {cardNumber, expMonth, expYear, cvv, amount, recipientAccountId} =
+    req.body
 
-  // Convert the amount in dollars to Hbars
+  try {
+    // This buys USDC and deplosits it into our Circle account
+    const circleResponse = await axios.post(
+      'https://api-sandbox.circle.com/v1/payments',
+      {
+        idempotencyKey: new Date().getTime().toString(),
+        metadata: {},
+        amount: {
+          amount: amount.toString(),
+          currency: 'USD',
+        },
+        verification: 'cvv',
+        source: {
+          id: 'card:' + cardNumber,
+          cvv: cvv,
+          expMonth: expMonth,
+          expYear: expYear,
+          type: 'card',
+        },
+        description: `Anonymous donation of $${amount} to account ${recipientAccountId}`,
+      },
+      {
+        headers: {
+          Authorization: 'Bearer ' + process.env.CIRCLE_API_KEY,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+
+    const circlePayment = circleResponse.data
+
+    // Check the payment status
+    if (circlePayment.status !== 'paid') {
+      return res
+        .status(400)
+        .json({status: 'error', error: 'Payment failed', circlePayment})
+    }
+  } catch (error) {
+    return res.status(500).json({status: 'error', error: error.toString()})
+  }
+
+  // Convert the amount in dollars to Hbars and send to the recipient from our account
   const amountInHbars = Hbar.from(amount, HbarUnit.USDCENT)
 
-  // Send donation from the main account to the recipient's account
-  const transactionId = await new TransferTransaction()
-    .addHbarTransfer(operatorId, amountInHbars.negated()) // sender's account and the amount to send
-    .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
-    .execute(client)
+  try {
+    const transactionId = await new TransferTransaction()
+      .addHbarTransfer(operatorId, amountInHbars.negated()) // sender's account and the amount to send
+      .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
+      .execute(client)
 
-  const receipt = await transactionId.getReceipt(client)
+    const receipt = await transactionId.getReceipt(client)
 
-  res.json({status: 'success', transactionId: transactionId.toString()})
+    res.json({status: 'success', transactionId: transactionId.toString()})
+  } catch (err) {
+    res.status(500).json({status: 'error', error: err.toString()})
+  }
 })
 
 router.post('/checkTransaction', async function (req, res, next) {
