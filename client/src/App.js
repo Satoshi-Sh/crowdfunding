@@ -1,6 +1,13 @@
 import { Navigation } from "./components";
 import { Route, Routes } from "react-router-dom";
-import { SingleProject, Projects, CreateProject, Signup, Login } from "./pages";
+import {
+  SingleProject,
+  Projects,
+  CreateProject,
+  Signup,
+  Login,
+  Account,
+} from "./pages";
 
 function App() {
   return (
@@ -12,6 +19,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/project/:id" element={<SingleProject />} />
+        <Route path="/account/:id" element={<Account />} />
       </Routes>
     </div>
   );

@@ -5,6 +5,7 @@ const sampleData = [
     businessName: "Sunny's Coffee House",
     due: "2023-07-31",
     goalAmount: 5000,
+    currentAmount: 3000,
     description:
       "Help Sunny's Coffee House expand their operations and reach new customers.",
     location: "Seattle",
@@ -17,6 +18,7 @@ const sampleData = [
     businessName: "Blossom Boutique",
     due: "2023-08-15",
     goalAmount: 3000,
+    currentAmount: 100,
     description:
       "Support Blossom Boutique in launching a new product line and creating local job opportunities.",
     location: "San Francisco",
@@ -29,6 +31,7 @@ const sampleData = [
     businessName: "Garden Eats",
     due: "2023-09-30",
     goalAmount: 10000,
+    currentAmount: 2300,
     description:
       "Assist Garden Eats in renovating their space to provide a better experience for their customers.",
     location: "New York City",
@@ -41,6 +44,7 @@ const sampleData = [
     businessName: "Harmony Yoga Studio",
     due: "2023-10-15",
     goalAmount: 8000,
+    currentAmount: 3000,
     description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
       condimentum, nisl vitae ultrices gravida, neque arcu mattis dui, in
       commodo mauris nisl vel neque. Suspendisse potenti. Nulla ullamcorper
@@ -60,6 +64,7 @@ const sampleData = [
     businessName: "Urban Bites Food Truck",
     due: "2023-11-30",
     goalAmount: 6000,
+    currentAmount: 3000,
     description:
       "Support Urban Bites Food Truck in purchasing new equipment to serve delicious meals on the go.Support Urban Bites Food Truck in purchasing new equipment to serve delicious meals on the go.",
     location: "Chicago",

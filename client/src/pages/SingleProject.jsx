@@ -21,9 +21,18 @@ const SingleProject = () => {
       </div>
       <p className="max-w-lg p-3 mx-auto">{data.description}</p>
       <div className="flex flex-row justify-between p-10">
+        <span className="text-gray-700 text-lg italic">
+          Current: ${data.currentAmount}
+        </span>
+        <span className="text-gray-700 italic text-lg">
+          Goal: ${data.goalAmount}
+        </span>
+      </div>
+      <div className="flex flex-row justify-between p-10">
         <span className="text-gray-700 italic">Due: {data.due}</span>
         <span className="text-gray-700 italic">{data.location}</span>
       </div>
+
       <Offcanvas data={data} />
     </div>
   );
