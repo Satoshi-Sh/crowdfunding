@@ -18,7 +18,7 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/project/:id" element={<SingleProject />} />
+        <Route path="/campaign/:id" element={<SingleProject />} />
         <Route path="/account/:id" element={<Account />} />
       </Routes>
     </div>

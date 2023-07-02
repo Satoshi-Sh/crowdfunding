@@ -20,7 +20,7 @@ const SingleProject = () => {
         ></img>
       </div>
       <p className="max-w-lg p-3 mx-auto">{data.description}</p>
-      <div className="flex flex-row justify-between p-10">
+      <div className="flex flex-row justify-evenly p-10">
         <span className="text-gray-700 text-lg italic">
           Current: ${data.currentAmount}
         </span>
