@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import Payment from "./Payment";
-import CardPayment from "./CardPayment";
+import React, {useState} from 'react'
+import Payment from './Payment'
+import CardPayment from './CardPayment'
 
 const Offcanvas = (props) => {
-  const { data } = props;
-  const [isClosed, setIsClosed] = useState(true);
+  const {data} = props
+  const [isClosed, setIsClosed] = useState(true)
   const handleClick = () => {
-    setIsClosed(!isClosed);
-  };
+    setIsClosed(!isClosed)
+  }
   return (
     <div>
       <button
@@ -31,11 +31,11 @@ const Offcanvas = (props) => {
             {data.businessName}
           </h4>
           <Payment />
-          <CardPayment />
+          <CardPayment accountId={data.accountId} />
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Offcanvas;
+export default Offcanvas

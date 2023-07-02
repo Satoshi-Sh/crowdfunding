@@ -1,7 +1,10 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, {useState} from 'react'
+import {Link} from 'react-router-dom'
+import {config} from './Config'
+import {PublicClientApplication} from '@azure/msal-browser'
+import {Component} from 'react'
 
-const Login = () => {
+/*const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -74,6 +77,74 @@ const Login = () => {
       </form>
     </div>
   );
-};
+};*/
 
-export default Login;
+class Login extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      error: null,
+      isAuthenticated: false,
+      user: {},
+    }
+    this.login = this.login.bind(this)
+    //
+    this.PublicClientApplication = new PublicClientApplication({
+      auth: {
+        clientId: config.appId,
+        redirectUri: config.redirectUri,
+        authority: config.authority,
+      },
+      cache: {
+        cacheLocation: 'sessionStorage',
+        storeAuthStateInCookie: true,
+      },
+    })
+  }
+  async login() {
+    console.log('hello')
+    try {
+      console.log('bye')
+      await this.PublicClientApplication.loginPopup({
+        scopes: config.scopes,
+        prompt: 'select_account',
+      })
+      console.log('insiseawait')
+      this.setState({isAuthenticated: true})
+    } catch (err) {
+      console.log(err.errorCode)
+      this.setState({
+        isAuthenticated: false,
+        user: {},
+        error: err,
+      })
+    }
+  }
+  logout() {
+    this.PublicClientApplication.logout()
+  }
+  render() {
+    return (
+      <div className="max-w-md mx-auto pt-48">
+        <form>
+          <div className="flex items-center justify-center">
+            {this.state.isAuthenticated ? (
+              <p>Succesfully logged in</p>
+            ) : (
+              <p>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => this.login()}
+                >
+                  Login with Microsoft
+                </button>
+              </p>
+            )}
+          </div>
+        </form>
+      </div>
+    )
+  }
+}
+
+export default Login

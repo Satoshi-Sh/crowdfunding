@@ -1,5 +1,5 @@
-import { Navigation } from "./components";
-import { Route, Routes } from "react-router-dom";
+import {Navigation} from './components'
+import {Route, Routes} from 'react-router-dom'
 import {
   SingleProject,
   Projects,
@@ -7,7 +7,10 @@ import {
   Signup,
   Login,
   Account,
-} from "./pages";
+} from './pages'
+
+import {config} from './pages/Config'
+import {PublicClientApplication} from '@azure/msal-browser'
 
 function App() {
   return (
@@ -22,7 +25,7 @@ function App() {
         <Route path="/account/:id" element={<Account />} />
       </Routes>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

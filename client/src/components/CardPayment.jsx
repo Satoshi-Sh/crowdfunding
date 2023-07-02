@@ -1,36 +1,32 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 
-const CardPayment = () => {
+const CardPayment = ({accountId}) => {
   const [showModal, setShowModal] = useState(false)
-  const [cardNumber, setCardNumber] = useState('')
-  const [cvv, setCvv] = useState('')
-  const [expiryMonth, setExpiryMonth] = useState('')
-  const [expiryYear, setExpiryYear] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [addressLine1, setAddressLine1] = useState('')
-  const [addressLine2, setAddressLine2] = useState('')
-  const [countryCode, setCountryCode] = useState('')
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
+  const [formData, setFormData] = useState({
+    cardNumber: '',
+    cvv: '',
+    expiryMonth: '',
+    expiryYear: '',
+    fullName: '',
+    addressLine1: '',
+    countryCode: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    email: '',
+  })
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Submit:', {
-      cardNumber,
-      cvv,
-      expiryMonth,
-      expiryYear,
-      fullName,
-      addressLine1,
-      addressLine2, //Remove this
-      countryCode,
-      // city, //New
-      // state, //New
-      // postalCode, //New
-      phone, // Remove this
-      email,
-    })
+    console.log('Submit:', formData)
   }
   return (
     <>
@@ -74,11 +70,12 @@ const CardPayment = () => {
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="cardNumber"
                         id="cardNumber"
                         type="text"
                         placeholder="Card Number"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
+                        value={formData.cardNumber}
+                        onChange={handleChange}
                         required
                       />
                     </div>
@@ -92,49 +89,52 @@ const CardPayment = () => {
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="cvv"
                         id="cvv"
                         type="text"
                         placeholder="CVV"
-                        value={cvv}
-                        onChange={(e) => setCvv(e.target.value)}
+                        value={formData.cvv}
+                        onChange={handleChange}
                         required
                       />
                     </div>
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="expirtyMonth"
+                        htmlFor="expiryMonth"
                       >
-                        Expirty Month
+                        Expiry Month
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="expiryMonth"
                         id="expiryMonth"
                         type="text"
-                        placeholder="Expirty Month 02"
-                        value={expiryMonth}
-                        onChange={(e) => setExpiryMonth(e.target.value)}
+                        placeholder="Expiry Month 02"
+                        value={formData.expiryMonth}
+                        onChange={handleChange}
                         required
                       />
                     </div>
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="expirtyYear"
+                        htmlFor="expiryYear"
                       >
                         Expiry Year
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="epiryYear"
-                        type="number"
-                        min="2023"
-                        placeholder="Expirey Year 2024"
-                        value={expiryYear}
-                        onChange={(e) => setExpiryYear(e.target.value)}
+                        name="expiryYear"
+                        id="expiryYear"
+                        type="text"
+                        placeholder="Expiry Year 2030"
+                        value={formData.expiryYear}
+                        onChange={handleChange}
                         required
                       />
                     </div>
+
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
@@ -144,14 +144,16 @@ const CardPayment = () => {
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="fullName"
                         id="fullName"
                         type="text"
                         placeholder="Full Name"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        value={formData.fullName}
+                        onChange={handleChange}
                         required
                       />
                     </div>
+
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
@@ -161,66 +163,92 @@ const CardPayment = () => {
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="addressLine1"
                         id="addressLine1"
                         type="text"
                         placeholder="Address Line 1"
-                        value={addressLine1}
-                        onChange={(e) => setAddressLine1(e.target.value)}
+                        value={formData.addressLine1}
+                        onChange={handleChange}
                         required
                       />
                     </div>
-                    <div className="mb-6">
-                      <label
-                        className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="addressLine2"
-                      >
-                        Address Line 2
-                      </label>
-                      <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="addressLine2"
-                        type="text"
-                        placeholder="Address Line 2"
-                        value={addressLine2}
-                        onChange={(e) => setAddressLine2(e.target.value)}
-                        required
-                      />
-                    </div>
+
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
                         htmlFor="countryCode"
                       >
-                        {/* switch to select */}
                         Country Code
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="countryCode"
                         id="countryCode"
                         type="text"
                         placeholder="Country Code"
-                        value={countryCode}
-                        onChange={(e) => setCountryCode(e.target.value)}
+                        value={formData.countryCode}
+                        onChange={handleChange}
                         required
                       />
                     </div>
+
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
-                        htmlFor="phone"
+                        htmlFor="city"
                       >
-                        Phone
+                        City
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        id="phone"
+                        name="city"
+                        id="city"
                         type="text"
-                        placeholder="phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="City"
+                        value={formData.city}
+                        onChange={handleChange}
                         required
                       />
                     </div>
+
+                    <div className="mb-6">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="state"
+                      >
+                        State
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="state"
+                        id="state"
+                        type="text"
+                        placeholder="State"
+                        value={formData.state}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-6">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2"
+                        htmlFor="postalCode"
+                      >
+                        Postal Code
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="postalCode"
+                        id="postalCode"
+                        type="text"
+                        placeholder="Postal Code"
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
                     <div className="mb-6">
                       <label
                         className="block text-gray-700 text-sm font-bold mb-2"
@@ -230,16 +258,17 @@ const CardPayment = () => {
                       </label>
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="email"
                         id="email"
                         type="text"
                         placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={formData.email}
+                        onChange={handleChange}
                         required
                       />
                     </div>
 
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-between">
                       <button
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         type="submit"
@@ -248,6 +277,17 @@ const CardPayment = () => {
                       </button>
                     </div>
                   </form>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none"
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>
