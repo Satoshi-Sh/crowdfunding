@@ -1,33 +1,36 @@
-import React, { useState } from "react";
+import React, {useState} from 'react'
 
 const CardPayment = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [cardNumber, setCardNumber] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [expiryMonth, setExpiryMonth] = useState("");
-  const [expiryYear, setExpiryYear] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [addressLine1, setAddressLine1] = useState("");
-  const [addressLine2, setAddressLine2] = useState("");
-  const [countryCode, setCountryCode] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const [showModal, setShowModal] = useState(false)
+  const [cardNumber, setCardNumber] = useState('')
+  const [cvv, setCvv] = useState('')
+  const [expiryMonth, setExpiryMonth] = useState('')
+  const [expiryYear, setExpiryYear] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [addressLine1, setAddressLine1] = useState('')
+  const [addressLine2, setAddressLine2] = useState('')
+  const [countryCode, setCountryCode] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Submit:", {
+    e.preventDefault()
+    console.log('Submit:', {
       cardNumber,
       cvv,
       expiryMonth,
       expiryYear,
       fullName,
       addressLine1,
-      addressLine2,
+      addressLine2, //Remove this
       countryCode,
-      phone,
+      city, //New
+      state, //New
+      postalCode, //New
+      phone, // Remove this
       email,
-    });
-  };
+    })
+  }
   return (
     <>
       <button
@@ -252,7 +255,7 @@ const CardPayment = () => {
         </>
       )}
     </>
-  );
-};
+  )
+}
 
-export default CardPayment;
+export default CardPayment
