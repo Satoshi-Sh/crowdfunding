@@ -136,17 +136,16 @@ router.post('/anonymousDonate', async function (req, res) {
     billingDetails,
     metadata,
   }
-
+  let cardId
   try {
     const response = await circle.cards.createCard(idempotencyKey, cardDetails)
+    cardId = response.data.id
   } catch (error) {
     res.status(500).json({
       status: 'error',
       message: error.message,
     })
   }
-
-  const cardId = response.data.id
 
   try {
     const createPaymentResponse = await circle.payments.createPayment({
