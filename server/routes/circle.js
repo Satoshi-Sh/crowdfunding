@@ -109,10 +109,12 @@ router.post('/anonymousDonate', async function (req, res) {
 
     cardId = response.data.data.id
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       status: 'error',
       message: error.message,
     })
+    return
   }
 
   try {
@@ -136,7 +138,9 @@ router.post('/anonymousDonate', async function (req, res) {
       paymentDetails,
     )
   } catch (error) {
-    return res.status(500).json({status: 'error', error: error.toString()})
+    console.log(error)
+    res.status(500).json({status: 'error', error: error.toString()})
+    return
   }
 
   // Convert the amount in dollars to Hbars and send to the recipient from our account
@@ -151,9 +155,11 @@ router.post('/anonymousDonate', async function (req, res) {
     const receipt = await transactionId.getReceipt(client)
 
     res.json({status: 'success', transactionId: transactionId.toString()})
+    return
   } catch (err) {
     console.log(err)
     res.status(500).json({status: 'error', error: err.toString()})
+    return
   }
 })
 
