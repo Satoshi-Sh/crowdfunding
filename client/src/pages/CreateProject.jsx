@@ -32,7 +32,7 @@ const CreateProject = () => {
   return (
     <div className="max-w-md mx-auto pt-48">
       <h1 className="text-2xl mb-3 font-bold text-center">
-        Create New Project
+        Create New Campaign
       </h1>
       <form
         onSubmit={handleSubmit}
@@ -43,13 +43,13 @@ const CreateProject = () => {
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="title"
           >
-            Project Title
+            Campaign Title
           </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="name"
             type="text"
-            placeholder="Enter project title"
+            placeholder="Enter campaign title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required

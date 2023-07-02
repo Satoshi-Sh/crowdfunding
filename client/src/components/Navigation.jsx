@@ -43,13 +43,13 @@ function Navigation() {
             to="/"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
-            Projects
+            Campaigns
           </Link>
           <Link
             to="/create-project"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
-            Create Project
+            Create Campain
           </Link>
           <Link
             //id=1 for now
