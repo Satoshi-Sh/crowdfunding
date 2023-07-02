@@ -16,6 +16,9 @@ const {
 } = require('@hashgraph/sdk')
 var {Circle, CircleEnvironments} = require('@circle-fin/circle-sdk')
 require('dotenv').config()
+const {v4: uuidv4} = require('uuid')
+const axios = require('axios')
+const {readKey, createMessage, encrypt} = require('openpgp')
 
 const myAccountId = process.env.MY_ACCOUNT_ID
 const myPrivateKey = process.env.MY_PRIVATE_KEY
@@ -70,6 +73,12 @@ router.post('/createFundraiser', async function (req, res) {
   })
 })
 
+router.post('/convertToHbar', async function (req, res) {
+  const {amount} = req.body
+  const hbars = await getHbarEquivalent(amount)
+  res.json({hbars: hbars})
+})
+
 router.post('/donate', async function (req, res) {
   const {senderPrivateKey, senderAccountId, recipientAccountId, amount} =
     req.body
@@ -80,12 +89,15 @@ router.post('/donate', async function (req, res) {
   client.setDefaultMaxTransactionFee(new Hbar(100))
 
   // Convert the amount in dollars to Hbars
-  const amountInHbars = Hbar.from(new BigNumber(amount), HbarUnit.USDCENT)
+  const hbars = await getHbarEquivalent(amount)
+  const hbarsInTinybars = hbars * 100000000 // 1 Hbar = 100,000,000 tinybars
+  const amountInTinybars = Math.round(hbarsInTinybars)
+  const amountInHbar = Hbar.fromTinybars(amountInTinybars)
 
   try {
     const transactionId = await new TransferTransaction()
-      .addHbarTransfer(senderAccountId, amountInHbars.negated()) // sender's account and the amount to send
-      .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
+      .addHbarTransfer(senderAccountId, amountInHbar.negated()) // sender's account and the amount to send
+      .addHbarTransfer(recipientAccountId, amountInHbar) // recipient's account and the amount to receive
       .execute(client)
 
     const receipt = await transactionId.getReceipt(client)
@@ -94,6 +106,21 @@ router.post('/donate', async function (req, res) {
   } catch (err) {
     res.json({status: 'error', error: err})
   }
+})
+
+router.post('/encryptCard', async function (req, res) {
+  const {cardNumber, cvc} = req.body
+  console.log(process.env.CIRCLE_API_KEY)
+
+  const circle = new Circle(
+    process.env.CIRCLE_API_KEY,
+    CircleEnvironments.sandbox, // API base url
+  )
+  const publicKey = await circle.encryption.getPublicKey()
+  console.log(publicKey)
+  return {}
+  const encryptedData = await encryptCardData(cardNumber, cvc, publicKey)
+  res.json({encryptedData: encryptedData})
 })
 
 // Sample input
@@ -121,16 +148,17 @@ router.post('/anonymousDonate', async function (req, res) {
     CircleEnvironments.sandbox, // API base url
   )
 
-  const {encryptedData, expMonth, expYear, billingDetails, metadata} = req.body
+  const {
+    encryptedData,
+    expMonth,
+    expYear,
+    billingDetails,
+    metadata,
+    amount,
+    recipientAccountId,
+  } = req.body
 
-  // Validate the request body to ensure all required fields are provided
-
-  if (!encryptedData || !expMonth || !expYear || !billingDetails || !metadata) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Missing required fields in request body',
-    })
-  }
+  const publicKey = circle.encryption.getPublicKey()
 
   const idempotencyKey = uuidv4()
 
@@ -184,7 +212,7 @@ router.post('/anonymousDonate', async function (req, res) {
 
   try {
     const transactionId = await new TransferTransaction()
-      .addHbarTransfer(operatorId, amountInHbars.negated()) // sender's account and the amount to send
+      .addHbarTransfer(myAccountId, amountInHbars.negated()) // sender's account and the amount to send
       .addHbarTransfer(recipientAccountId, amountInHbars) // recipient's account and the amount to receive
       .execute(client)
 
@@ -230,5 +258,55 @@ router.get('/accountInfo/:accountId', async function (req, res, next) {
     .execute(client)
   res.json(info)
 })
+
+async function getHbarEquivalent(dollarAmount) {
+  const response = await axios.get(
+    'https://mainnet-public.mirrornode.hedera.com/api/v1/network/exchangerate',
+  )
+
+  const data = response.data
+
+  // cent_equivalent represents the number of cents one hbar is worth
+  const centEquivalentPerHbar =
+    data.current_rate.cent_equivalent / data.current_rate.hbar_equivalent
+
+  // Convert input dollar amount to cents
+  const cents = dollarAmount * 100
+
+  // Convert input cents to hbars
+  const hbars = cents / centEquivalentPerHbar
+
+  return hbars
+}
+
+async function encryptCardData(number, cvv, publicKey) {
+  // Card data to be encrypted
+  const cardData = {
+    number,
+    cvv,
+  }
+
+  // Decode the public key
+  const decodedPublicKey = await readKey({
+    armoredKey: Buffer.from(publicKey).toString('base64'),
+  })
+
+  // Create a message from the card data
+  const message = await createMessage({text: JSON.stringify(cardData)})
+
+  // Encrypt the message with the public key
+  const ciphertext = await encrypt({
+    message,
+    encryptionKeys: decodedPublicKey,
+  })
+
+  // Return the encrypted message
+  const encryptedData = {
+    encryptedMessage: Buffer.from(ciphertext).toString('utf8'),
+    keyId: decodedPublicKey.getKeyId().toHex(),
+  }
+
+  return encryptedData
+}
 
 module.exports = router
