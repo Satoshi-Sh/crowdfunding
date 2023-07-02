@@ -123,10 +123,11 @@ const CardPayment = () => {
                       <input
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="epiryYear"
-                        type="text"
+                        type="number"
+                        min="2023"
                         placeholder="Expirey Year 2024"
-                        value={expiryMonth}
-                        onChange={(e) => setExpiryMonth(e.target.value)}
+                        value={expiryYear}
+                        onChange={(e) => setExpiryYear(e.target.value)}
                         required
                       />
                     </div>
